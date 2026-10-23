@@ -14,6 +14,7 @@ import {
   sameDay,
   subtotal,
 } from "@/lib/orders";
+import { ui } from "@/lib/ui";
 import OrderBuilder, { type NewOrder } from "./OrderBuilder";
 import KitchenBoard from "./KitchenBoard";
 import BillsPanel from "./BillsPanel";
@@ -98,7 +99,7 @@ export default function ComandasApp() {
     return () => clearTimeout(t);
   }, [printJob]);
 
-  if (menu === null || settings === null || orders === null) return <p className="muted">Cargando…</p>;
+  if (menu === null || settings === null || orders === null) return <p className={ui.muted}>Cargando…</p>;
 
   const activeCount = orders.filter(isActive).length;
   const openCount = orders.filter(isOpenBill).length;
@@ -163,62 +164,69 @@ export default function ComandasApp() {
   const print = (order: Order, mode: TicketMode) => setPrintJob({ order, mode });
 
   return (
-    <div className="app-shell">
-      <div className="tabs big" role="tablist">
-        {(
-          [
-            ["nueva", "Nueva comanda", 0],
-            ["cocina", "Cocina", activeCount],
-            ["cuentas", "Cuentas", openCount],
-            ["menu", "Menú y ajustes", 0],
-          ] as const
-        ).map(([id, label, count]) => (
-          <button
-            key={id}
-            type="button"
-            role="tab"
-            aria-selected={tab === id}
-            className={tab === id ? "active" : ""}
-            onClick={() => setTab(id)}
-          >
-            {label}
-            {count > 0 ? <span className="tab-badge">{count}</span> : null}
-          </button>
-        ))}
+    <>
+      {/* Al imprimir solo sale el ticket (antes lo hacía .app-shell > :not(.print-area)) */}
+      <div className="print:hidden">
+        <div className="mb-4 mt-[18px] flex gap-1 overflow-x-auto border-b border-border" role="tablist">
+          {(
+            [
+              ["nueva", "Nueva comanda", 0],
+              ["cocina", "Cocina", activeCount],
+              ["cuentas", "Cuentas", openCount],
+              ["menu", "Menú y ajustes", 0],
+            ] as const
+          ).map(([id, label, count]) => (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              aria-selected={tab === id}
+              className={`-mb-px cursor-pointer whitespace-nowrap border-b-[3px] px-3 py-2.5 text-base sm:px-5 sm:py-3 ${tab === id
+                  ? "border-b-text-primary font-semibold text-text-primary"
+                  : "border-b-transparent text-text-muted"
+                }`}
+              onClick={() => setTab(id)}
+            >
+              {label}
+              {count > 0 ? <span className={ui.tabBadge}>{count}</span> : null}
+            </button>
+          ))}
+        </div>
+
+        {message ? <p className={ui.toast}>{message}</p> : null}
+
+        {tab === "nueva" && <OrderBuilder menu={menu} settings={settings} orders={orders} onSubmit={createOrder} />}
+
+        {tab === "cocina" && (
+          <KitchenBoard orders={orders} now={now} onAdvance={advance} onCancel={cancel} onPrint={(o) => print(o, "cocina")} />
+        )}
+
+        {tab === "cuentas" && (
+          <BillsPanel
+            orders={orders}
+            settings={settings}
+            now={now}
+            onPay={pay}
+            onCancel={cancel}
+            onPrintBill={(o) => print(o, "cuenta")}
+          />
+        )}
+
+        {tab === "menu" && (
+          <MenuEditor
+            menu={menu}
+            settings={settings}
+            onMenu={setMenu}
+            onSettings={setSettings}
+            onReset={() => setMenu(DEFAULT_MENU)}
+          />
+        )}
       </div>
 
-      {message ? <p className="toast sticky">{message}</p> : null}
-
-      {tab === "nueva" && <OrderBuilder menu={menu} settings={settings} orders={orders} onSubmit={createOrder} />}
-
-      {tab === "cocina" && (
-        <KitchenBoard orders={orders} now={now} onAdvance={advance} onCancel={cancel} onPrint={(o) => print(o, "cocina")} />
-      )}
-
-      {tab === "cuentas" && (
-        <BillsPanel
-          orders={orders}
-          settings={settings}
-          now={now}
-          onPay={pay}
-          onCancel={cancel}
-          onPrintBill={(o) => print(o, "cuenta")}
-        />
-      )}
-
-      {tab === "menu" && (
-        <MenuEditor
-          menu={menu}
-          settings={settings}
-          onMenu={setMenu}
-          onSettings={setSettings}
-          onReset={() => setMenu(DEFAULT_MENU)}
-        />
-      )}
-
-      <div className="print-area" aria-hidden="true">
+      {/* Sin aria-hidden: el global.css oculta [aria-hidden="true"] al imprimir */}
+      <div className="hidden print:block">
         {printJob ? <Ticket order={printJob.order} settings={settings} mode={printJob.mode} /> : null}
       </div>
-    </div>
+    </>
   );
 }

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { MenuItem, Order, OrderLine, OrderType, Settings } from "@/lib/types";
 import { formatCOP, uid } from "@/lib/format";
 import { isOpenBill, itemCount, orderNumber, subtotal } from "@/lib/orders";
+import { ui } from "@/lib/ui";
 
 export interface NewOrder {
   type: OrderType;
@@ -89,12 +90,19 @@ export default function OrderBuilder({ menu, settings, orders, onSubmit }: Props
 
   const sub = subtotal(lines);
 
+  const tableClass = (n: number) => {
+    const base = "cursor-pointer rounded-lg border py-2.5 font-semibold";
+    if (table === n) return `${base} border-primary bg-primary text-white`;
+    if (busy.has(n)) return `${base} border-yellow/35 bg-yellow/10 text-yellow`;
+    return `${base} border-border bg-surface-secondary text-foreground hover:border-text-primary`;
+  };
+
   return (
-    <div className="builder">
+    <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_380px]">
       {lines.length > 0 ? (
         <button
           type="button"
-          className="cart-bar"
+          className="fixed inset-x-3 bottom-3 z-20 flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-primary bg-primary px-4 py-3.5 text-white shadow-lg lg:hidden"
           onClick={() => document.getElementById("pedido")?.scrollIntoView({ behavior: "smooth", block: "start" })}
         >
           <span>
@@ -103,42 +111,51 @@ export default function OrderBuilder({ menu, settings, orders, onSubmit }: Props
           <strong>Ver pedido ↓</strong>
         </button>
       ) : null}
-      <section className="panel">
-        <div className="panel-head wrap">
-          <h2>Menú</h2>
+
+      <section className={ui.panel}>
+        <div className={ui.panelHead}>
+          <h2 className={ui.title}>Menú</h2>
           <input
             type="search"
-            className="search"
+            className={`${ui.input} sm:w-[210px]`}
             placeholder="Buscar producto…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
         </div>
 
-        <div className="pills spaced-b">
+        <div className="mb-3.5 flex flex-wrap gap-1.5">
           {categories.map((c) => (
-            <button key={c} type="button" className={category === c ? "pill active" : "pill"} onClick={() => setCategory(c)}>
+            <button
+              key={c}
+              type="button"
+              className={`cursor-pointer rounded-full border px-3.5 py-1.5 text-[0.86rem] ${category === c
+                  ? "border-primary bg-primary text-white"
+                  : "border-border bg-surface-secondary text-foreground hover:bg-surface"
+                }`}
+              onClick={() => setCategory(c)}
+            >
               {c}
             </button>
           ))}
         </div>
 
         {menu.length === 0 ? (
-          <p className="muted">El menú está vacío. Agrega productos en la pestaña “Menú”.</p>
+          <p className={ui.muted}>El menú está vacío. Agrega productos en la pestaña “Menú”.</p>
         ) : shown.length === 0 ? (
-          <p className="muted">No se encontraron productos.</p>
+          <p className={ui.muted}>No se encontraron productos.</p>
         ) : (
-          <div className="menu-grid">
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-[repeat(auto-fill,minmax(150px,1fr))]">
             {shown.map((m) => (
               <button
                 key={m.id}
                 type="button"
-                className="menu-card"
+                className="grid min-h-[84px] cursor-pointer content-between gap-1.5 rounded-[10px] border border-border bg-surface-secondary p-3 text-left text-foreground transition-colors duration-100 enabled:hover:border-text-primary enabled:hover:bg-surface enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-45"
                 disabled={!m.available}
                 onClick={() => addItem(m)}
               >
-                <span className="menu-name">{m.name}</span>
-                <span className="menu-meta">
+                <span className="font-semibold leading-tight">{m.name}</span>
+                <span className="text-[0.85rem] tabular-nums text-text-muted">
                   {m.available ? formatCOP(m.price) : "Agotado"}
                 </span>
               </button>
@@ -147,18 +164,18 @@ export default function OrderBuilder({ menu, settings, orders, onSubmit }: Props
         )}
       </section>
 
-      <aside className="side">
-        <section className="panel" id="pedido">
-          <h2>Nueva comanda</h2>
+      <aside className="grid gap-4 lg:sticky lg:top-4">
+        <section className={ui.panel} id="pedido">
+          <h2 className={`${ui.title} mb-3`}>Nueva comanda</h2>
 
-          <div className="seg" role="tablist">
+          <div className={ui.seg} role="tablist">
             {TYPES.map((t) => (
               <button
                 key={t.id}
                 type="button"
                 role="tab"
                 aria-selected={type === t.id}
-                className={type === t.id ? "active" : ""}
+                className={type === t.id ? ui.segOn : ui.segOff}
                 onClick={() => {
                   setType(t.id);
                   setError("");
@@ -171,12 +188,12 @@ export default function OrderBuilder({ menu, settings, orders, onSubmit }: Props
 
           {type === "mesa" ? (
             <>
-              <div className="table-grid">
+              <div className="mt-3 grid grid-cols-5 gap-1.5">
                 {Array.from({ length: settings.tables }, (_, i) => i + 1).map((n) => (
                   <button
                     key={n}
                     type="button"
-                    className={`table-btn${table === n ? " active" : ""}${busy.has(n) ? " busy" : ""}`}
+                    className={tableClass(n)}
                     onClick={() => setTable(n)}
                     title={busy.has(n) ? `En curso: ${busy.get(n)!.map(orderNumber).join(", ")}` : "Libre"}
                   >
@@ -184,59 +201,69 @@ export default function OrderBuilder({ menu, settings, orders, onSubmit }: Props
                   </button>
                 ))}
               </div>
-              <p className="hint">
+              <p className={ui.hint}>
                 {table !== null && busy.has(table)
                   ? `La mesa ${table} ya tiene la comanda ${busy.get(table)!.map(orderNumber).join(", ")} sin cobrar.`
-                  : "Las mesas en naranja tienen una cuenta abierta."}
+                  : "Las mesas en amarillo tienen una cuenta abierta."}
               </p>
             </>
           ) : null}
 
-          <div className="form-stack spaced">
-            <label>
+          <div className={`${ui.formStack} mt-[18px]`}>
+            <label className={ui.label}>
               Cliente (opcional)
-              <input value={customer} onChange={(e) => setCustomer(e.target.value)} />
+              <input className={ui.input} value={customer} onChange={(e) => setCustomer(e.target.value)} />
             </label>
             {type === "domicilio" ? (
-              <label>
+              <label className={ui.label}>
                 Dirección / teléfono
-                <input value={contact} onChange={(e) => setContact(e.target.value)} />
+                <input className={ui.input} value={contact} onChange={(e) => setContact(e.target.value)} />
               </label>
             ) : null}
           </div>
 
-          <h3 className="ticket-title">Pedido</h3>
+          <h3 className={ui.subtitle}>Pedido</h3>
           {lines.length === 0 ? (
-            <p className="muted">Toca un producto del menú para agregarlo.</p>
+            <p className={ui.muted}>Toca un producto del menú para agregarlo.</p>
           ) : (
-            <ul className="lines">
+            <ul className="mb-2 grid gap-2.5">
               {lines.map((l) => (
                 <li key={l.id}>
-                  <div className="line-main">
-                    <div className="qty">
-                      <button type="button" aria-label="Quitar uno" onClick={() => changeQty(l.id, -1)}>
+                  <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2.5">
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        className="h-7 w-7 cursor-pointer rounded-lg border border-border bg-surface text-[1.05rem] leading-none text-foreground hover:bg-primary hover:text-white"
+                        aria-label="Quitar uno"
+                        onClick={() => changeQty(l.id, -1)}
+                      >
                         −
                       </button>
-                      <span>{l.qty}</span>
-                      <button type="button" aria-label="Agregar uno" onClick={() => changeQty(l.id, 1)}>
+                      <span className="min-w-[18px] text-center font-bold">{l.qty}</span>
+                      <button
+                        type="button"
+                        className="h-7 w-7 cursor-pointer rounded-lg border border-border bg-surface text-[1.05rem] leading-none text-foreground hover:bg-primary hover:text-white"
+                        aria-label="Agregar uno"
+                        onClick={() => changeQty(l.id, 1)}
+                      >
                         +
                       </button>
                     </div>
-                    <div className="line-name">
+                    <div className="grid gap-px text-[0.92rem]">
                       {l.name}
                       <button
                         type="button"
-                        className="link"
+                        className={`${ui.link} justify-self-start !text-[0.78rem]`}
                         onClick={() => setOpenNotes((o) => ({ ...o, [l.id]: !o[l.id] }))}
                       >
                         {l.note ? "Editar nota" : "+ Nota"}
                       </button>
                     </div>
-                    <strong className="line-price">{formatCOP(l.qty * l.price)}</strong>
+                    <strong className="text-[0.9rem] tabular-nums">{formatCOP(l.qty * l.price)}</strong>
                   </div>
                   {openNotes[l.id] || l.note ? (
                     <input
-                      className="line-note"
+                      className="mt-1.5 w-full rounded-lg border border-border bg-background px-2 py-1.5 text-[0.85rem] text-foreground placeholder:text-text-muted"
                       placeholder="Ej. sin cebolla, término medio…"
                       value={l.note}
                       onChange={(e) => setLineNote(l.id, e.target.value)}
@@ -247,27 +274,32 @@ export default function OrderBuilder({ menu, settings, orders, onSubmit }: Props
             </ul>
           )}
 
-          <label className="block">
+          <label className={`${ui.label} mt-3.5`}>
             Nota general (opcional)
-            <input placeholder="Ej. alérgico al maní" value={note} onChange={(e) => setNote(e.target.value)} />
+            <input
+              className={ui.input}
+              placeholder="Ej. alérgico al maní"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            />
           </label>
 
-          <div className="total-box">
-            <span>
+          <div className={`${ui.totalBox} mb-3 mt-4 bg-background`}>
+            <span className={ui.totalLabel}>
               {itemCount(lines)} {itemCount(lines) === 1 ? "producto" : "productos"}
             </span>
-            <strong>{formatCOP(sub)}</strong>
+            <strong className={ui.totalValue}>{formatCOP(sub)}</strong>
           </div>
 
-          {error ? <p className="alert">{error}</p> : null}
+          {error ? <p className={ui.alert}>{error}</p> : null}
 
-          <button type="button" className="btn btn-primary btn-block" onClick={submit}>
+          <button type="button" className={`${ui.btnPrimary} ${ui.block}`} onClick={submit}>
             Enviar a cocina
           </button>
           {lines.length > 0 ? (
             <button
               type="button"
-              className="btn btn-block"
+              className={`${ui.btn} ${ui.block}`}
               onClick={() => {
                 setLines([]);
                 setOpenNotes({});

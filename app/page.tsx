@@ -1,37 +1,23 @@
-import Image from "next/image";
 import ComandasApp from "@/components/ComandasApp";
+import Header from "@/components/Header";
 
 export default function Home() {
   return (
-    <main className="container">
-      <header className="top">
-        <div className="brand">
-          <Image
-            src="/logo.png"
-            alt="SatCore Solutions"
-            width={200}
-            height={65}
-            className="brand-logo"
-            priority
-          />
-
-          <div>
-            <div className="brand-tagline">
-              Soluciones digitales seguras, accesibles y funcionales para todos.
-            </div>
-          </div>
-        </div>
-
-        <div className="top-content">
-          <h1>Comandas digitales</h1>
-          <p className="muted">
-            Toma el pedido, envíalo a cocina y cóbralo, todo desde una sola
-            pantalla.
+    <>
+      <Header />
+      <main className="satcore-container pb-24 pt-8 sm:pt-12">
+        <section className="mb-8 flex flex-col items-center gap-3 border-b border-border pb-8 text-center">
+          <p className="max-w-xs text-xs leading-snug text-text-muted sm:max-w-sm sm:text-sm">
+            Soluciones digitales seguras, accesibles y funcionales para todos.
           </p>
-        </div>
-      </header>
+          <h1 className="text-3xl sm:text-4xl">Comandas digitales</h1>
+          <p className="max-w-md text-text-muted">
+            Toma el pedido, envíalo a cocina y cóbralo, todo desde una sola pantalla.
+          </p>
+        </section>
 
-      <ComandasApp />
-    </main>
+        <ComandasApp />
+      </main>
+    </>
   );
 }

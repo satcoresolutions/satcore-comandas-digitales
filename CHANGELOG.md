@@ -30,6 +30,51 @@ El formato sigue una estructura basada en versiones y categorías de cambios, si
 
 ---
 
+## [1.2.0] - 2026-10-23
+
+### Added
+
+- Incorporación de **Tailwind CSS** para la construcción y el mantenimiento de la interfaz.
+- Implementación de un sistema de temas con modo oscuro predeterminado y opción de modo claro.
+- Persistencia de la preferencia de tema mediante `localStorage`.
+- Preparación de la aplicación como **Progressive Web App (PWA)** para facilitar su instalación en dispositivos compatibles.
+- Incorporación del botón de instalación de la aplicación cuando el navegador ofrece esta funcionalidad.
+- Orientaciones de instalación para dispositivos iOS mediante la opción de añadir la aplicación a la pantalla de inicio desde Safari.
+- Configuración de metadatos para la aplicación web y su identificación en dispositivos compatibles.
+- Incorporación de configuración para el color del tema del navegador y la experiencia de instalación en dispositivos Apple.
+- Integración del manifiesto web y de los iconos de la aplicación para los distintos tamaños compatibles.
+
+### Changed
+
+- Actualización de la interfaz para ofrecer una experiencia visual más consistente y adaptable a diferentes tamaños de pantalla.
+- Organización de los estilos mediante las utilidades de Tailwind CSS.
+- Actualización del diseño para facilitar el uso de la aplicación en teléfonos, tabletas y equipos de escritorio.
+- Actualización de los metadatos SEO para mantener la identidad y descripción de Comandas digitales.
+- Integración del componente de pie de página dentro del layout principal.
+- Organización del layout raíz para centralizar la configuración visual, los metadatos, el tema y los componentes globales.
+- Integración del registro del Service Worker para dar soporte a las funcionalidades PWA configuradas en el proyecto.
+
+### Fixed
+
+- Ajustes de presentación y distribución de los elementos de la interfaz en diferentes tamaños de pantalla.
+- Corrección de inconsistencias visuales relacionadas con la aplicación de estilos y el cambio de tema.
+- Ajustes en la inicialización del tema para aplicar la preferencia guardada antes de mostrar la interfaz.
+
+### Removed
+
+- Eliminación progresiva de estilos anteriores reemplazados por las utilidades de Tailwind CSS, cuando corresponde.
+
+### Security
+
+- Se mantiene el almacenamiento local de la información mediante `localStorage`, sin requerir una base de datos remota.
+- Se conserva la ausencia de cuentas de usuario y autenticación en esta versión.
+- Se mantiene la advertencia de que los datos dependen del navegador y dispositivo utilizados.
+- Se recuerda que borrar los datos del navegador puede ocasionar su pérdida y que no existe sincronización automática entre dispositivos ni copia de seguridad automática en la nube.
+- La instalación como PWA no implica por sí misma la incorporación de cifrado, autenticación ni sincronización remota.
+- Se recomienda verificar que el Service Worker y los recursos almacenados en caché no expongan información sensible ni impidan recibir actualizaciones de la aplicación.
+
+---
+
 ## [1.1.0] - 2026-10-21
 
 ### Added
