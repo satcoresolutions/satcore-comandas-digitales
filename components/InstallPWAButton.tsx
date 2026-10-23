@@ -52,8 +52,14 @@ export default function InstallPWAButton() {
 
   return (
     <div className="relative">
-      <button type="button" onClick={install} className={ui.btnAccent}>
-        📲 Instalar app
+      <button
+        type="button"
+        onClick={install}
+        aria-expanded={showHelp}
+        className={`${ui.btnPrimary} inline-flex items-center justify-center gap-2`}
+      >
+        <span aria-hidden="true">📲</span>
+        Instalar app
       </button>
       {showHelp && (
         <div className="absolute right-0 z-1500 mt-2 w-64 rounded-lg border border-border-strong bg-surface p-3 text-xs shadow-xl">

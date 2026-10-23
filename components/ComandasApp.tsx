@@ -167,7 +167,7 @@ export default function ComandasApp() {
     <>
       {/* Al imprimir solo sale el ticket (antes lo hacía .app-shell > :not(.print-area)) */}
       <div className="print:hidden">
-        <div className="mb-4 mt-[18px] flex gap-1 overflow-x-auto border-b border-border" role="tablist">
+        <div className="mb-4 mt-4.5 flex gap-1 overflow-x-auto border-b border-border" role="tablist">
           {(
             [
               ["nueva", "Nueva comanda", 0],

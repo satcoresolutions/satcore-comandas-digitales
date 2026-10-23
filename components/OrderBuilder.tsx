@@ -117,7 +117,7 @@ export default function OrderBuilder({ menu, settings, orders, onSubmit }: Props
           <h2 className={ui.title}>Menú</h2>
           <input
             type="search"
-            className={`${ui.input} sm:w-[210px]`}
+            className={`${ui.input} sm:w-52.5`}
             placeholder="Buscar producto…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -150,7 +150,7 @@ export default function OrderBuilder({ menu, settings, orders, onSubmit }: Props
               <button
                 key={m.id}
                 type="button"
-                className="grid min-h-[84px] cursor-pointer content-between gap-1.5 rounded-[10px] border border-border bg-surface-secondary p-3 text-left text-foreground transition-colors duration-100 enabled:hover:border-text-primary enabled:hover:bg-surface enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-45"
+                className="grid min-h-21 cursor-pointer content-between gap-1.5 rounded-[10px] border border-border bg-surface-secondary p-3 text-left text-foreground transition-colors duration-100 enabled:hover:border-text-primary enabled:hover:bg-surface enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-45"
                 disabled={!m.available}
                 onClick={() => addItem(m)}
               >
@@ -209,7 +209,7 @@ export default function OrderBuilder({ menu, settings, orders, onSubmit }: Props
             </>
           ) : null}
 
-          <div className={`${ui.formStack} mt-[18px]`}>
+          <div className={`${ui.formStack} mt-4.5`}>
             <label className={ui.label}>
               Cliente (opcional)
               <input className={ui.input} value={customer} onChange={(e) => setCustomer(e.target.value)} />
@@ -239,7 +239,7 @@ export default function OrderBuilder({ menu, settings, orders, onSubmit }: Props
                       >
                         −
                       </button>
-                      <span className="min-w-[18px] text-center font-bold">{l.qty}</span>
+                      <span className="min-w-4.5 text-center font-bold">{l.qty}</span>
                       <button
                         type="button"
                         className="h-7 w-7 cursor-pointer rounded-lg border border-border bg-surface text-[1.05rem] leading-none text-foreground hover:bg-primary hover:text-white"
@@ -253,7 +253,7 @@ export default function OrderBuilder({ menu, settings, orders, onSubmit }: Props
                       {l.name}
                       <button
                         type="button"
-                        className={`${ui.link} justify-self-start !text-[0.78rem]`}
+                        className={`${ui.link} justify-self-start text-[0.78rem]!`}
                         onClick={() => setOpenNotes((o) => ({ ...o, [l.id]: !o[l.id] }))}
                       >
                         {l.note ? "Editar nota" : "+ Nota"}

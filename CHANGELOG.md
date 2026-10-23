@@ -30,7 +30,7 @@ El formato sigue una estructura basada en versiones y categorías de cambios, si
 
 ---
 
-## [1.2.0] - 2026-10-23
+## [1.2.1] - 2026-10-23
 
 ### Added
 
